@@ -26,7 +26,7 @@ export default {
     getStockInfo(code, all = 0) {
         return service({
             method: 'get',
-            url: `${HSA_FENSHI_BASE_URL}/api/v1/hsa_fenshi`,
+            url: `${HSA_FENSHI_BASE_URL}/v1/hsa_fenshi`,
             data: {
                 token: HSA_FENSHI_TOKEN,
                 code: code,
