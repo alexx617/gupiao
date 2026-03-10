@@ -1,17 +1,17 @@
 import ajax from '@/service/ajax';
 
 /**
- * 格式化价格（转换为元）
- * hsa_fenshi接口返回的价格需要除以1000转换为"元"
- * 例如：JiaGe=91020 表示 91.02元，计算方式：91020/1000 = 91.02
- * @param {number|string} value - 原始价格值
- * @returns {string} 格式化后的价格，保留2位小数
+ * 格式化hsa_fenshi接口返回的价格（转换为元）
+ * hsa_fenshi接口返回的价格单位是0.1分，需要除以1000转换为"元"
+ * 例如：JiaGe=91460 表示 91.46元，计算方式：91460/1000 = 91.46
+ * @param {number|string} value - 原始价格值（单位：0.1分）
+ * @returns {string} 格式化后的价格（单位：元），保留2位小数
  */
 const formatPrice = (value) => {
     if (value === null || value === undefined || value === '--') return '--';
     const num = Number(value);
     if (isNaN(num)) return '--';
-    return (num / 10).toFixed(2);
+    return (num / 1000).toFixed(2);
 };
 
 /**
@@ -103,6 +103,7 @@ const transformHsaFenshiData = (response, stockCode) => {
 /**
  * 转换alltick接口数据为统一格式
  * 该接口返回实时成交数据，用于播报时更新实时价格
+ * 只返回最新价和时间，其他数据从hsa_fenshi缓存获取
  * @param {Object} response - 接口原始响应
  * @returns {Object} 转换后的股票数据，key为股票代码
  */
@@ -118,10 +119,7 @@ const transformAlltickData = (response) => {
             result[code] = {
                 code: code,
                 price: formatAlltickPrice(tick.price),
-                volume: tick.volume || '--',
-                amount: tick.turnover || '--',
                 time: formatAlltickTime(tick.tick_time),
-                tradeDirection: tick.trade_direction || 0,
                 dataSource: 'alltick'
             };
         }
@@ -220,21 +218,17 @@ const stockApi = {
         Object.keys(alltickData).forEach(code => {
             const tickData = alltickData[code];
             if (merged[code]) {
-                // 计算涨跌幅：(最新价格 - 昨收价) / 昨收价 * 100%
                 const changePercent = this.calculateChangePercent(
                     tickData.price,
                     merged[code].preClose
                 );
                 
-                // 用alltick的实时数据覆盖现有数据中的对应字段
                 merged[code] = {
                     ...merged[code],
-                    price: tickData.price,           // 更新最新价
-                    volume: tickData.volume,         // 更新成交量
-                    amount: tickData.amount,         // 更新成交额
-                    time: tickData.time,             // 更新行情时间
-                    changePercent: changePercent,    // 计算涨跌幅
-                    dataSource: 'merged'             // 标记为合并数据
+                    price: tickData.price,
+                    time: tickData.time,
+                    changePercent: changePercent,
+                    dataSource: 'merged'
                 };
             }
         });

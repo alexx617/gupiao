@@ -3,7 +3,7 @@ const format = {
         if (value === null || value === undefined || value === '') return '--';
         const num = Number(value);
         if (isNaN(num)) return '--';
-        return (num / 100).toFixed(2);
+        return num.toFixed(2);
     },
 
     formatPercent(value) {

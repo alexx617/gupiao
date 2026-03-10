@@ -213,7 +213,7 @@ const handleRefresh = async () => {
     try {
         const alltickData = await stockApi.fetchAlltickData(stockList.value);
         const currentData = stockData.value;
-        const mergedData = stockApi.mergeAlltickData(currentData, alltickData);
+        const mergedData = stockApi.mergeStockData(currentData, alltickData);
         
         Object.keys(mergedData).forEach(code => {
             store.commit('stocks/UPDATE_STOCK_DATA', { stockCode: code, data: mergedData[code] });
@@ -260,7 +260,7 @@ const handleDelete = (code) => {
     }
 
     .cell-changed {
-        animation: cell-flash 1s ease-out;
+        animation: cell-flash 3s ease-out;
         background-color: rgba(64, 158, 255, 0.3);
         border-radius: 4px;
         padding: 2px 4px;
