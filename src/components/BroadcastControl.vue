@@ -109,13 +109,34 @@ const generateBroadcastText = () => {
     stockList.value.forEach(code => {
         const data = stockData.value[code];
         if (data) {
-            const name = data.name || code;  // 股票名称
-            const price = format.formatPrice(data.price);  // 格式化价格
-            const change = format.formatChange(data.changePercent);  // 格式化涨跌幅
+            const name = data.name || code;
+            const price = format.formatPrice(data.price);
+            const change = format.formatChange(data.changePercent);
             texts.push(`${name}，最新价${price}元，涨跌幅${change}%`);
         }
     });
     return texts.join('。');
+};
+
+/**
+ * 生成涨速警告播报文本
+ * 涨速超过10%的股票需要额外播报
+ * @returns {string} 涨速警告播报文本
+ */
+const generateSpeedWarningText = () => {
+    const warnings = [];
+    stockList.value.forEach(code => {
+        const data = stockData.value[code];
+        if (data && data.changeSpeed !== '--') {
+            const speedValue = Number(data.changeSpeed);
+            if (!isNaN(speedValue) && speedValue > 10000) {
+                const name = data.name || code;
+                const speed = format.formatChange(data.changeSpeed);
+                warnings.push(`${name}，目前涨速为${speed}%`);
+            }
+        }
+    });
+    return warnings.join('。');
 };
 
 /**
@@ -125,34 +146,38 @@ const generateBroadcastText = () => {
  * 2. 合并到现有数据中
  * 3. 更新store中的股票数据
  * 4. 生成播报文本并语音播报
+ * 5. 检查涨速，超过10%的股票额外播报
  */
 const broadcastStockData = async () => {
-    // 股票列表为空则停止播报
     if (stockList.value.length === 0) {
         handleStop();
         return;
     }
 
-    // 1. 调用alltick接口获取实时数据
     const alltickData = await stockApi.fetchAlltickData(stockList.value);
-    
-    // 2. 合并现有数据和alltick实时数据
     const currentData = stockData.value;
     const mergedData = stockApi.mergeStockData(currentData, alltickData);
     
-    // 3. 更新store中的股票数据，触发表格刷新
     Object.keys(mergedData).forEach(code => {
         const displayData = stockApi.mapDataForDisplay(mergedData[code]);
         store.commit('stocks/UPDATE_STOCK_DATA', { stockCode: code, data: displayData });
     });
     
-    // 4. 生成播报文本并语音播报
     const text = generateBroadcastText();
     if (text) {
         try {
             await speech.speak(text);
         } catch (error) {
             console.error('语音播报失败:', error);
+        }
+    }
+    
+    const speedWarning = generateSpeedWarningText();
+    if (speedWarning) {
+        try {
+            await speech.speak(speedWarning);
+        } catch (error) {
+            console.error('涨速警告播报失败:', error);
         }
     }
 };

@@ -190,9 +190,11 @@ const stockApi = {
     /**
      * 计算涨跌幅
      * 公式：(最新价格 - 昨收价) / 昨收价 * 100%
+     * 返回值单位：0.001%（与hsa_fenshi接口保持一致）
+     * 例如：涨跌幅0.41%，返回410
      * @param {number|string} currentPrice - 当前最新价格
      * @param {number|string} preClose - 昨收价
-     * @returns {string} 涨跌幅百分比，保留2位小数
+     * @returns {string} 涨跌幅，单位0.001%
      */
     calculateChangePercent(currentPrice, preClose) {
         const price = Number(currentPrice);
@@ -200,14 +202,33 @@ const stockApi = {
         if (isNaN(price) || isNaN(pre) || pre === 0) {
             return '--';
         }
-        const change = ((price - pre) / pre * 100).toFixed(2);
+        const change = ((price - pre) / pre * 100 * 1000).toFixed(0);
         return change;
+    },
+
+    /**
+     * 计算涨速
+     * 公式：(当前价格 - 上一次缓存价格) / 上一次缓存价格 * 100%
+     * 返回值单位：0.001%（与hsa_fenshi接口保持一致）
+     * 例如：涨速0.41%，返回410
+     * @param {number|string} currentPrice - 当前最新价格
+     * @param {number|string} lastPrice - 上一次缓存的价格
+     * @returns {string} 涨速，单位0.001%
+     */
+    calculateChangeSpeed(currentPrice, lastPrice) {
+        const price = Number(currentPrice);
+        const last = Number(lastPrice);
+        if (isNaN(price) || isNaN(last) || last === 0) {
+            return '--';
+        }
+        const speed = ((price - last) / last * 100 * 1000).toFixed(0);
+        return speed;
     },
 
     /**
      * 合并两个接口的数据
      * 用alltick的实时价格更新hsa_fenshi的基础数据
-     * 同时计算涨跌幅：(最新价格 - 昨收价) / 昨收价 * 100%
+     * 同时计算涨跌幅和涨速
      * @param {Object} existingData - 现有数据（来自hsa_fenshi）
      * @param {Object} alltickData - alltick实时数据
      * @returns {Object} 合并后的数据
@@ -223,11 +244,17 @@ const stockApi = {
                     merged[code].preClose
                 );
                 
+                const changeSpeed = this.calculateChangeSpeed(
+                    tickData.price,
+                    merged[code].price
+                );
+                
                 merged[code] = {
                     ...merged[code],
                     price: tickData.price,
                     time: tickData.time,
                     changePercent: changePercent,
+                    changeSpeed: changeSpeed,
                     dataSource: 'merged'
                 };
             }
