@@ -1,13 +1,13 @@
 export default {
     namespaced: true,
 
-    state: {
+    state: () => ({
         stockList: [],
         stockData: {},
         stockHistory: [],
         broadcastInterval: 1,
         isBroadcasting: false
-    },
+    }),
 
     mutations: {
         ADD_STOCK(state, stockCode) {

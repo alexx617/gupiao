@@ -96,6 +96,11 @@ const handleAddStock = async () => {
         return;
     }
 
+    if (stockList.value.length >= 10) {
+        errorMsg.value = '最多只能添加10只股票';
+        return;
+    }
+
     loading.value = true;
     stockName.value = '';
     errorMsg.value = '';
@@ -122,6 +127,12 @@ const handleAddStock = async () => {
 
 const addToStockList = async (item) => {
     if (isInStockList(item.code)) return;
+
+    if (stockList.value.length >= 10) {
+        errorMsg.value = '最多只能添加10只股票';
+        setTimeout(() => { errorMsg.value = ''; }, 3000);
+        return;
+    }
 
     loading.value = true;
     try {

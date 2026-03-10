@@ -33,7 +33,7 @@ const speech = {
             }
 
             utterance.lang = options.lang || 'zh-CN';
-            utterance.rate = options.rate || 1;
+            utterance.rate = options.rate || 2;
             utterance.pitch = options.pitch || 1;
             utterance.volume = options.volume || 1;
 

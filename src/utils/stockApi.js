@@ -170,6 +170,7 @@ const stockApi = {
     /**
      * 批量获取股票实时数据（alltick接口）
      * 用于播报时批量更新所有股票的实时价格
+     * 每次最多请求5只股票，超过5只分批请求，间隔10秒
      * @param {Array<string>} stockList - 股票代码数组
      * @returns {Promise<Object>} 股票数据对象，key为股票代码
      */
@@ -178,13 +179,31 @@ const stockApi = {
             return {};
         }
         
-        try {
-            const response = await ajax.getAlltickData(stockList);
-            return transformAlltickData(response);
-        } catch (error) {
-            console.error('获取 alltick 数据失败:', error);
-            return {};
+        const BATCH_SIZE = 5;
+        const BATCH_DELAY = 10000;
+        const result = {};
+        
+        const batches = [];
+        for (let i = 0; i < stockList.length; i += BATCH_SIZE) {
+            batches.push(stockList.slice(i, i + BATCH_SIZE));
         }
+        
+        for (let i = 0; i < batches.length; i++) {
+            const batch = batches[i];
+            try {
+                const response = await ajax.getAlltickData(batch);
+                const batchData = transformAlltickData(response);
+                Object.assign(result, batchData);
+            } catch (error) {
+                console.error(`获取 alltick 数据失败 (批次 ${i + 1}):`, error);
+            }
+            
+            if (i < batches.length - 1) {
+                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
+            }
+        }
+        
+        return result;
     },
 
     /**
