@@ -7,8 +7,12 @@ import service from '@/service/server';
 const HSA_FENSHI_TOKEN = 'c33eca087bb2315b45a7a9440285470e';
 const ALLTICK_TOKEN = '528e4b8d16ccb1ca4eaba4ed6c513457-c-app';
 
-const HSA_FENSHI_BASE_URL = process.env.VUE_APP_HSA_FENSHI_URL || '';
-const ALLTICK_BASE_URL = process.env.VUE_APP_ALLTICK_URL || '';
+const isProduction = process.env.NODE_ENV === 'production';
+const HSA_FENSHI_BASE_URL = isProduction ? process.env.VUE_APP_HSA_FENSHI_URL : '';
+const ALLTICK_BASE_URL = isProduction ? process.env.VUE_APP_ALLTICK_URL : '';
+
+const HSA_FENSHI_PATH = isProduction ? '/v1/hsa_fenshi' : '/api/v1/hsa_fenshi';
+const ALLTICK_PATH = isProduction ? '/quote-stock-b-api/trade-tick' : '/alltick/quote-stock-b-api/trade-tick';
 
 const formatCodeToAlltick = (code) => {
     if (!code) return '';
@@ -26,7 +30,7 @@ export default {
     getStockInfo(code, all = 0) {
         return service({
             method: 'get',
-            url: `${HSA_FENSHI_BASE_URL}/v1/hsa_fenshi`,
+            url: `${HSA_FENSHI_BASE_URL}${HSA_FENSHI_PATH}`,
             data: {
                 token: HSA_FENSHI_TOKEN,
                 code: code,
@@ -48,7 +52,7 @@ export default {
         
         return service({
             method: 'get',
-            url: `${ALLTICK_BASE_URL}/quote-stock-b-api/trade-tick`,
+            url: `${ALLTICK_BASE_URL}${ALLTICK_PATH}`,
             data: {
                 token: ALLTICK_TOKEN,
                 query: query
