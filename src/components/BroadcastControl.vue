@@ -9,6 +9,7 @@
                 :max="60"
                 :step="1"
                 size="small"
+                :disabled="isBroadcasting"
                 @change="handleIntervalChange"
             />
             <span class="unit">分钟</span>

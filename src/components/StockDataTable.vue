@@ -21,7 +21,7 @@
             <el-table-column prop="name" label="股票名称" width="100" fixed />
             <el-table-column label="最新价(元)" width="100" fixed>
                 <template #default="{ row }">
-                    <span>{{ format.formatPrice(row.price) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'price') }">{{ format.formatPrice(row.price) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="行情时间" width="100">
@@ -31,83 +31,83 @@
             </el-table-column>
             <el-table-column label="涨跌幅(%)" width="100">
                 <template #default="{ row }">
-                    <span :class="getChangeClass(row.changePercent)">
+                    <span :class="[getChangeClass(row.changePercent), { 'cell-changed': isChanged(row.code, 'changePercent') }]">
                         {{ format.formatChange(row.changePercent) }}
                     </span>
                 </template>
             </el-table-column>
             <el-table-column label="涨速(%)" width="90">
                 <template #default="{ row }">
-                    <span :class="getChangeClass(row.changeSpeed)">
+                    <span :class="[getChangeClass(row.changeSpeed), { 'cell-changed': isChanged(row.code, 'changeSpeed') }]">
                         {{ format.formatPercent(row.changeSpeed) }}
                     </span>
                 </template>
             </el-table-column>
             <el-table-column label="成交量(手)" width="110">
                 <template #default="{ row }">
-                    <span>{{ format.formatVolume(row.volume) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'volume') }">{{ format.formatVolume(row.volume) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="成交额(元)" width="120">
                 <template #default="{ row }">
-                    <span>{{ format.formatAmount(row.amount) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'amount') }">{{ format.formatAmount(row.amount) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="开盘价(元)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatPrice(row.openPrice) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'openPrice') }">{{ format.formatPrice(row.openPrice) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="最高价(元)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatPrice(row.highPrice) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'highPrice') }">{{ format.formatPrice(row.highPrice) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="最低价(元)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatPrice(row.lowPrice) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'lowPrice') }">{{ format.formatPrice(row.lowPrice) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="昨收价(元)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatPrice(row.preClose) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'preClose') }">{{ format.formatPrice(row.preClose) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="振幅(%)" width="90">
                 <template #default="{ row }">
-                    <span>{{ format.formatPercent(row.amplitude) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'amplitude') }">{{ format.formatPercent(row.amplitude) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="换手率(%)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatPercent(row.turnoverRate) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'turnoverRate') }">{{ format.formatPercent(row.turnoverRate) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="量比" width="80">
                 <template #default="{ row }">
-                    <span>{{ format.formatNumber(row.volumeRatio) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'volumeRatio') }">{{ format.formatNumber(row.volumeRatio) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="委比(%)" width="90">
                 <template #default="{ row }">
-                    <span :class="getChangeClass(row.bidAskRatio)">
+                    <span :class="[getChangeClass(row.bidAskRatio), { 'cell-changed': isChanged(row.code, 'bidAskRatio') }]">
                         {{ format.formatPercent(row.bidAskRatio) }}
                     </span>
                 </template>
             </el-table-column>
             <el-table-column label="内盘(手)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatVolume(row.innerVolume) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'innerVolume') }">{{ format.formatVolume(row.innerVolume) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="外盘(手)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatVolume(row.outerVolume) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'outerVolume') }">{{ format.formatVolume(row.outerVolume) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="均价(元)" width="100">
                 <template #default="{ row }">
-                    <span>{{ format.formatPrice(row.avgPrice) }}</span>
+                    <span :class="{ 'cell-changed': isChanged(row.code, 'avgPrice') }">{{ format.formatPrice(row.avgPrice) }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="80" fixed="right">
@@ -129,16 +129,42 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useStore } from 'vuex';
 import format from '@/utils/format';
 import stockApi from '@/utils/stockApi';
 
 const store = useStore();
 const loading = ref(false);
+const prevData = ref({});
+const changedCells = ref({});
 
 const stockList = computed(() => store.getters['stocks/getStockList']);
 const stockData = computed(() => store.getters['stocks/getAllStockData']);
+
+watch(stockData, (newData) => {
+    const changes = {};
+    stockList.value.forEach(code => {
+        const newStock = newData[code];
+        const oldStock = prevData.value[code];
+        if (newStock && oldStock) {
+            const fields = ['price', 'changePercent', 'changeSpeed', 'volume', 'amount', 
+                'openPrice', 'highPrice', 'lowPrice', 'preClose', 'amplitude', 
+                'turnoverRate', 'volumeRatio', 'bidAskRatio', 'innerVolume', 
+                'outerVolume', 'avgPrice'];
+            fields.forEach(field => {
+                if (newStock[field] !== oldStock[field]) {
+                    changes[`${code}-${field}`] = true;
+                }
+            });
+        }
+    });
+    changedCells.value = changes;
+    prevData.value = JSON.parse(JSON.stringify(newData));
+    setTimeout(() => {
+        changedCells.value = {};
+    }, 1000);
+}, { deep: true });
 
 const tableData = computed(() => {
     return stockList.value.map(code => {
@@ -166,6 +192,10 @@ const tableData = computed(() => {
         };
     });
 });
+
+const isChanged = (code, field) => {
+    return changedCells.value[`${code}-${field}`];
+};
 
 const getChangeClass = (value) => {
     if (value === null || value === undefined || value === '') return '';
@@ -227,6 +257,24 @@ const handleDelete = (code) => {
     .down {
         color: #67c23a;
         font-weight: 500;
+    }
+
+    .cell-changed {
+        animation: cell-flash 1s ease-out;
+        background-color: rgba(64, 158, 255, 0.3);
+        border-radius: 4px;
+        padding: 2px 4px;
+    }
+
+    @keyframes cell-flash {
+        0% {
+            background-color: rgba(64, 158, 255, 0.6);
+            transform: scale(1.05);
+        }
+        100% {
+            background-color: transparent;
+            transform: scale(1);
+        }
     }
 
     .empty-tip {

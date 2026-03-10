@@ -25,7 +25,7 @@ module.exports = defineConfig({
                 }
             },
             '/alltick': {
-                target: 'https://quote.alltick.io',
+                target: 'http://quote.alltick.io',
                 changeOrigin: true,
                 pathRewrite: {
                     '^/alltick': ''
