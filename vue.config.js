@@ -3,7 +3,7 @@ const { defineConfig } = require('@vue/cli-service');
 
 module.exports = defineConfig({
     outputDir: 'dist',
-    publicPath: '/',
+    publicPath: process.env.NODE_ENV === 'production' ? '/gupiao/' : '/',
     assetsDir: 'static',
     lintOnSave: process.env.NODE_ENV === 'development',
     productionSourceMap: false,
