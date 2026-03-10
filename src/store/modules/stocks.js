@@ -27,7 +27,7 @@ export default {
         },
 
         UPDATE_STOCK_DATA(state, { stockCode, data }) {
-            state.stockData[stockCode] = data;
+            state.stockData = { ...state.stockData, [stockCode]: data };
         },
 
         ADD_TO_HISTORY(state, { code, name }) {

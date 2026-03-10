@@ -119,6 +119,26 @@ const generateBroadcastText = () => {
 };
 
 /**
+ * 根据传入的数据生成播报文本
+ * 直接使用传入的数据，不依赖computed属性
+ * @param {Object} data - 股票数据对象
+ * @returns {string} 播报文本
+ */
+const generateBroadcastTextFromData = (data) => {
+    const texts = [];
+    stockList.value.forEach(code => {
+        const stockData = data[code];
+        if (stockData) {
+            const name = stockData.name || code;
+            const price = format.formatPrice(stockData.price);
+            const change = format.formatChange(stockData.changePercent);
+            texts.push(`${name}，最新价${price}元，涨跌幅${change}%`);
+        }
+    });
+    return texts.join('。');
+};
+
+/**
  * 生成涨速警告播报文本
  * 涨速超过10%的股票需要额外播报
  * @returns {string} 涨速警告播报文本
@@ -132,6 +152,28 @@ const generateSpeedWarningText = () => {
             if (!isNaN(speedValue) && speedValue > 10000) {
                 const name = data.name || code;
                 const speed = format.formatChange(data.changeSpeed);
+                warnings.push(`${name}，目前涨速为${speed}%`);
+            }
+        }
+    });
+    return warnings.join('。');
+};
+
+/**
+ * 根据传入的数据生成涨速警告播报文本
+ * 直接使用传入的数据，不依赖computed属性
+ * @param {Object} data - 股票数据对象
+ * @returns {string} 涨速警告播报文本
+ */
+const generateSpeedWarningTextFromData = (data) => {
+    const warnings = [];
+    stockList.value.forEach(code => {
+        const stockData = data[code];
+        if (stockData && stockData.changeSpeed !== '--') {
+            const speedValue = Number(stockData.changeSpeed);
+            if (!isNaN(speedValue) && speedValue > 10000) {
+                const name = stockData.name || code;
+                const speed = format.formatChange(stockData.changeSpeed);
                 warnings.push(`${name}，目前涨速为${speed}%`);
             }
         }
@@ -158,12 +200,14 @@ const broadcastStockData = async () => {
     const currentData = stockData.value;
     const mergedData = stockApi.mergeStockData(currentData, alltickData);
     
-    Object.keys(mergedData).forEach(code => {
-        const displayData = stockApi.mapDataForDisplay(mergedData[code]);
-        store.commit('stocks/UPDATE_STOCK_DATA', { stockCode: code, data: displayData });
-    });
+    if (Object.keys(mergedData).length > 0) {
+        Object.keys(mergedData).forEach(code => {
+            const displayData = stockApi.mapDataForDisplay(mergedData[code]);
+            store.commit('stocks/UPDATE_STOCK_DATA', { stockCode: code, data: displayData });
+        });
+    }
     
-    const text = generateBroadcastText();
+    const text = generateBroadcastTextFromData(mergedData);
     if (text) {
         try {
             await speech.speak(text);
@@ -172,7 +216,7 @@ const broadcastStockData = async () => {
         }
     }
     
-    const speedWarning = generateSpeedWarningText();
+    const speedWarning = generateSpeedWarningTextFromData(mergedData);
     if (speedWarning) {
         try {
             await speech.speak(speedWarning);

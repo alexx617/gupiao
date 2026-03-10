@@ -257,6 +257,11 @@ const stockApi = {
                     changeSpeed: changeSpeed,
                     dataSource: 'merged'
                 };
+            } else {
+                merged[code] = {
+                    ...tickData,
+                    dataSource: 'alltick'
+                };
             }
         });
         
