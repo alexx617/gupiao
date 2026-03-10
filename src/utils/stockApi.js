@@ -107,24 +107,22 @@ const transformHsaFenshiData = (response, stockCode) => {
  * @returns {Object} 转换后的股票数据，key为股票代码
  */
 const transformAlltickData = (response) => {
-    // 检查响应是否有效
     if (!response || response.ret !== 200 || !response.data || !response.data.tick_list) {
         return {};
     }
     
     const result = {};
-    // 遍历tick列表，提取每只股票的实时数据
     response.data.tick_list.forEach(tick => {
         const code = parseAlltickCode(tick.code);
         if (code) {
             result[code] = {
-                code: code,                                    // 股票代码
-                price: formatAlltickPrice(tick.price),         // 最新价 - 格式化字符串价格
-                volume: tick.volume || '--',                   // 成交量 - 用于更新表格"成交量"列
-                amount: tick.turnover || '--',                 // 成交额 - 用于更新表格"成交额"列
-                time: formatAlltickTime(tick.tick_time),       // 成交时间 - 格式化时间戳
-                tradeDirection: tick.trade_direction || 0,     // 交易方向: 0默认, 1买入, 2卖出
-                dataSource: 'alltick'                          // 数据来源标识
+                code: code,
+                price: formatAlltickPrice(tick.price),
+                volume: tick.volume || '--',
+                amount: tick.turnover || '--',
+                time: formatAlltickTime(tick.tick_time),
+                tradeDirection: tick.trade_direction || 0,
+                dataSource: 'alltick'
             };
         }
     });

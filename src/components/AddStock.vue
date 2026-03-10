@@ -9,6 +9,7 @@
                     v-model="stockCode"
                     placeholder="请输入股票代码"
                     clearable
+                    :disabled="loading"
                     @keyup.enter="handleAddStock"
                 />
                 <el-button type="primary" @click="handleAddStock" :loading="loading">

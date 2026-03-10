@@ -56,12 +56,10 @@ export default {
      * @returns {Promise<Object>} 接口响应数据，包含tick_list数组
      */
     getAlltickData(codes) {
-        // 将股票代码列表转换为alltick要求的格式
         const symbolList = codes.map(code => ({
             code: formatCodeToAlltick(code)
         }));
         
-        // 构建查询参数
         const query = JSON.stringify({
             data: {
                 symbol_list: symbolList
