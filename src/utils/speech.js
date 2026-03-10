@@ -3,30 +3,64 @@ const speech = {
         return 'speechSynthesis' in window;
     },
 
+    voicesLoaded: false,
+    voicesPromise: null,
+
     getVoices() {
         if (!this.isSupported()) return [];
         return window.speechSynthesis.getVoices();
     },
 
-    getChineseVoice() {
+    async waitForVoices() {
+        if (this.voicesLoaded) return this.getVoices();
+        
+        if (this.voicesPromise) return this.voicesPromise;
+        
         const voices = this.getVoices();
+        if (voices.length > 0) {
+            this.voicesLoaded = true;
+            return voices;
+        }
+        
+        this.voicesPromise = new Promise((resolve) => {
+            const checkVoices = () => {
+                const v = this.getVoices();
+                if (v.length > 0) {
+                    this.voicesLoaded = true;
+                    resolve(v);
+                }
+            };
+            
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = checkVoices;
+            }
+            
+            setTimeout(() => {
+                checkVoices();
+            }, 100);
+        });
+        
+        return this.voicesPromise;
+    },
+
+    getChineseVoice(voices) {
         return voices.find(voice => voice.lang.includes('zh')) || voices[0];
     },
 
-    speak(text, options = {}) {
+    async speak(text, options = {}) {
+        if (!this.isSupported()) {
+            throw new Error('浏览器不支持语音播报');
+        }
+
+        if (!text) {
+            return;
+        }
+
+        const voices = await this.waitForVoices();
+        
         return new Promise((resolve, reject) => {
-            if (!this.isSupported()) {
-                reject(new Error('浏览器不支持语音播报'));
-                return;
-            }
-
-            if (!text) {
-                resolve();
-                return;
-            }
-
             const utterance = new SpeechSynthesisUtterance(text);
-            const chineseVoice = this.getChineseVoice();
+            const chineseVoice = this.getChineseVoice(voices);
 
             if (chineseVoice) {
                 utterance.voice = chineseVoice;
@@ -45,7 +79,11 @@ const speech = {
                 reject(new Error(`语音播报失败: ${event.error}`));
             };
 
-            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.cancel();
+            
+            setTimeout(() => {
+                window.speechSynthesis.speak(utterance);
+            }, 50);
         });
     },
 
@@ -74,11 +112,5 @@ const speech = {
         return window.speechSynthesis.paused;
     }
 };
-
-if (speech.isSupported()) {
-    window.speechSynthesis.onvoiceschanged = () => {
-        speech.getVoices();
-    };
-}
 
 export default speech;
