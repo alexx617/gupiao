@@ -290,10 +290,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-/**
- * 播报控制组件样式
- * 采用flex布局，水平排列各控制项
- */
 .broadcast-control {
     display: flex;
     align-items: center;
@@ -302,29 +298,44 @@ onUnmounted(() => {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
 
-    // 每个控制项的样式
     .broadcast-control-item {
         display: flex;
         align-items: center;
         gap: 8px;
 
-        // 标签文字样式
         .label {
             font-size: 14px;
             color: #606266;
         }
 
-        // 单位文字样式
         .unit {
             font-size: 14px;
             color: #909399;
         }
 
-        // 状态标签文字样式
         .status-label {
             font-size: 14px;
             color: #606266;
+        }
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .broadcast-control {
+        padding: 12px;
+        gap: 16px;
+
+        .broadcast-control-item {
+            width: 100%;
+            justify-content: space-between;
+
+            .label,
+            .unit,
+            .status-label {
+                font-size: 13px;
+            }
         }
     }
 }

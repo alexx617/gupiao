@@ -79,4 +79,22 @@ onUnmounted(() => {
         }
     }
 }
+
+@media screen and (max-width: 768px) {
+    .home {
+        padding: 12px;
+
+        .home-content {
+            .top-section {
+                margin-bottom: 12px;
+            }
+
+            .main-section {
+                .add-stock-section {
+                    margin-bottom: 12px;
+                }
+            }
+        }
+    }
+}
 </style>

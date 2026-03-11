@@ -276,4 +276,45 @@ const clearHistory = () => {
         }
     }
 }
+
+@media screen and (max-width: 768px) {
+    .add-stock {
+        flex-direction: column;
+        gap: 16px;
+        padding: 12px;
+
+        .add-stock-right {
+            border-left: none;
+            border-top: 1px solid #ebeef5;
+            padding-left: 0;
+            padding-top: 16px;
+        }
+
+        .section-header {
+            h3 {
+                font-size: 15px;
+            }
+        }
+
+        .add-stock-content {
+            flex-direction: column;
+            gap: 8px;
+
+            .el-button {
+                width: 100%;
+            }
+        }
+
+        .history-item {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+
+            .history-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+    }
+}
 </style>

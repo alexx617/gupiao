@@ -284,4 +284,42 @@ const handleDelete = (code) => {
         font-size: 14px;
     }
 }
+
+@media screen and (max-width: 768px) {
+    .stock-data-table {
+        padding: 12px;
+
+        .stock-data-table-header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+
+            h3 {
+                font-size: 15px;
+            }
+
+            .el-button {
+                width: 100%;
+            }
+        }
+
+        :deep(.el-table) {
+            font-size: 12px;
+
+            .el-table__header th {
+                padding: 8px 0;
+                font-size: 12px;
+            }
+
+            .el-table__body td {
+                padding: 8px 0;
+            }
+
+            .cell {
+                padding: 0 4px;
+                font-size: 12px;
+            }
+        }
+    }
+}
 </style>

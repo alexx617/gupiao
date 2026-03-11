@@ -1,3 +1,7 @@
+---
+alwaysApply: false
+description: 
+---
 # 项目代码规则
 
 ## 技术栈概览

@@ -17,12 +17,22 @@ const handleBeforeUnload = () => {
     speech.stop();
 };
 
+const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+        if (speech.isPaused()) {
+            speech.resume();
+        }
+    }
+};
+
 onMounted(() => {
     window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 });
 
 onUnmounted(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
     speech.stop();
 });
 </script>
